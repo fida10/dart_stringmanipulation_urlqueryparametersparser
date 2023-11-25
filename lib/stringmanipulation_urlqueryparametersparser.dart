@@ -14,25 +14,54 @@ manipulation methods and pattern matching with regular expressions.
  */
 
 Map<String, String>? parseQueryParams(String url) {
+  // Map<String, String>? result = {};
+
+  // if (!url.startsWith("https://")) {
+  //   return null;
+  // }
+  // try {
+  //   for (var indivEntry in url.split('?')[1].split('&')) {
+  //     final indivEntryAsList = indivEntry.split('=');
+  //     result[indivEntryAsList[0]] = indivEntryAsList[1];
+  //   }
+  // } on RangeError catch (e) {
+  //   print("Error: $e");
+  // }
+
+  // return result;
+//above with split
+
+//above with regexGroups
+  //start searching for = sign
+  //key is from & or ? to = sign
+  //value is from = sign to & or ?
+
   Map<String, String>? result = {};
 
   if (!url.startsWith("https://")) {
     return null;
   }
-  try {
-    for (var indivEntry in url.split('?')[1].split('&')) {
-      final indivEntryAsList = indivEntry.split('=');
-      result[indivEntryAsList[0]] = indivEntryAsList[1];
-    }
-  } on RangeError catch (e) {
-    print("Error: $e");
+
+  final keys = RegExp(r'[?&]([^=]+)=').allMatches(url).map((element) {
+    return element.group(1);
+  }).toList();
+  if(keys.isEmpty){
+    return result;
+  }
+  final values = RegExp(r'(?<==)[^&?]+').allMatches(url).map((element) {
+    return element.group(0);
+  }).toList();
+
+  for (var i = 0; i < keys.length; i++) {
+    result[keys[i]!]= values[i]!;
   }
 
   return result;
 }
 
 void main() {
-  final x = parseQueryParams('https://example.com/page');
+  final x = parseQueryParams(
+      'example.com/page?param=value');
   print(x);
 
   // final y = parseQueryParams('https://example.com/page?param=value');
